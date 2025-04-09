@@ -1,7 +1,5 @@
 import {
-  GetServerSidePropsContext,
   GetStaticPropsContext,
-  InferGetServerSidePropsType,
   InferGetStaticPropsType,
 } from "next";
 import style from "./[id].module.css";
@@ -58,6 +56,7 @@ export default function Page({
 
   if (router.isFallback)
     return (
+      <>
       <Head>
         <title>한입 북스</title>
         <meta property="og:image" content="/thumbnail.png" />
@@ -68,6 +67,7 @@ export default function Page({
         />
       </Head>
       <div>로딩 중입니다.</div>
+      </>
     );
 
   if (!book) return "문제가 발생 하였습니다.";
