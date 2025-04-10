@@ -6,7 +6,7 @@ import { BookData } from "@/types";
 async function AllBooks() {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_SERVER_URL}/book`,
-    { cache: "no-store" }
+    { cache: "force-cache" }
   );
   const allBooks: BookData[] = await response.json();
 
@@ -25,7 +25,8 @@ async function AllBooks() {
 
 async function RecoBooks() {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/random`
+    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/random`,
+    { next: {revalidate: 3} }
   );
   if (!response.ok) {
     return <div>오류가 발생했습니다...</div>;

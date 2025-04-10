@@ -1,5 +1,12 @@
 import Image from "next/image";
 import style from "./page.module.css";
+import { notFound } from "next/navigation";
+
+// export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return [{id: "1"}, {id: "2"},{id: "3"}];
+}
 
 export default async function Page(props: {
   params: Promise<{ id: string | string[] }>;
@@ -13,6 +20,9 @@ export default async function Page(props: {
   );
 
   if (!response.ok) {
+    if(response.status === 404) {
+      notFound();
+    }
     return <div>오류가 발생했습니다...</div>;
   }
 
@@ -26,12 +36,7 @@ export default async function Page(props: {
         className={style.cover_img_container}
         style={{ backgroundImage: `url('${coverImgUrl}')` }}
       >
-        <Image
-          src={coverImgUrl}
-          alt={title}
-          fill
-          style={{ objectFit: "cover" }} // 스타일 조정 필요 시
-        />
+        <img src={coverImgUrl} alt={title} />
       </div>
       <div className={style.title}>{title}</div>
       <div className={style.subTitle}>{subTitle}</div>
