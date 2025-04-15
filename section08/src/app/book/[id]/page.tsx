@@ -1,21 +1,22 @@
-import Image from "next/image";
 import style from "./page.module.css";
 import { notFound } from "next/navigation";
+import { ReviewData } from "@/types";
+import ReviewItem from "@/components/review-item";
+import ReviewEditor from "@/components/review-editor";
 
 // export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [{id: "1"}, {id: "2"},{id: "3"}];
+  return [{ id: "1" }, { id: "2" }, { id: "3" }];
 }
 
-async function BookDetail({bookId}:{bookId:string}) {
-
+async function BookDetail({ bookId }: { bookId: string }) {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${bookId}`
   );
 
   if (!response.ok) {
-    if(response.status === 404) {
+    if (response.status === 404) {
       notFound();
     }
     return <div>오류가 발생했습니다...</div>;
@@ -43,35 +44,37 @@ async function BookDetail({bookId}:{bookId:string}) {
   );
 }
 
-function ReviewEditor() {
 
-  async function createReviewAction(formData : FormData) {
-    'use server'
+async function ReviewList({ bookId }: { bookId: string }) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/review/book/${bookId}`
+  );
 
-    const content = formData.get("content")?.toString();
-    const author = formData.get("author")?.toString(); 
+  if (!response.ok) {
+    throw new Error(`Review fetch failed : ${response.statusText}`);
   }
 
-  return <div>
+  const reviews: ReviewData[] = await response.json();
+
+  return (
     <section>
-      <form action={createReviewAction}>
-        <input name="content" placeholder="리뷰 내용" />
-        <input name="author" placeholder="작성자" />
-        <button type="submit">작성하기</button>
-      </form>
+      {reviews.map((review) => (
+        <ReviewItem key={`review-item-${review.id}`} {...review} />
+      ))}
     </section>
-  </div>
+  );
 }
 
-export default async function Page(props: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function Page(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
 
   // const bookId = Array.isArray(id) ? id[0] : id;
 
-  return <div className={style.container}>
-    <BookDetail bookId={id} />
-    <ReviewEditor />
-  </div>
+  return (
+    <div className={style.container}>
+      <BookDetail bookId={id} />
+      <ReviewEditor bookId={id} />
+      <ReviewList bookId={id} />
+    </div>
+  );
 }
